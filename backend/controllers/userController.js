@@ -1,5 +1,7 @@
 const User = require('../models/userModel');
+//asynHandler-error handling
 const asyncHandler = require('express-async-handler');
+//bcrypt to hash password
 const bcrypt = require('bcrypt');
 
 // @desc Get all users
@@ -18,19 +20,17 @@ const getAllUsers = asyncHandler(async (req, res) => {
 
 });
 
-// @desc Create new user
-// @route POST /users
-// @access Private
+//Create new user
 const createNewUser = asyncHandler(async (req, res) => {
     const {firstname, lastname, email, password, roles } = req.body;
 
-    // Confirm data
+    // Confirm all data fields
     if (!firstname || !lastname || !email || !password || !Array.isArray(roles) || !roles.length) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
     // Check for duplicate email
-    const duplicate = await User.findOne({ email }).lean().exec();
+    const duplicate = await User.findOne({ email }).lean();
 
     if (duplicate) {
         return res.status(409).json({ message: 'User already exists' });
@@ -51,9 +51,7 @@ const createNewUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc Update a user
-// @route PATCH /users
-// @access Private
+// Update a user
 const updateUser = asyncHandler(async (req, res) => {
     const { id, firstname, lastname, email, password, roles, active } = req.body
 
@@ -63,14 +61,14 @@ const updateUser = asyncHandler(async (req, res) => {
     }
 
     // Does the user exist to update?
-    const user = await User.findById(id).exec();
+    const user = await User.findById(id);
 
     if (!user) {
         return res.status(400).json({ message: 'User not found' })
     }
 
     // Check for duplicate 
-    const duplicate = await User.findOne({ email }).lean().exec()
+    const duplicate = await User.findOne({ email }).lean()
 
     // Allow updates to the original user 
     if (duplicate && duplicate?._id.toString() !== id) {
@@ -84,7 +82,7 @@ const updateUser = asyncHandler(async (req, res) => {
     user.active = active;
 
     if (password) {
-        // Hash password 
+        // Hash password for update
         user.password = await bcrypt.hash(password, 10) // salt rounds 
     }
 
@@ -93,11 +91,9 @@ const updateUser = asyncHandler(async (req, res) => {
     res.json({ message: `${updatedUser.firstname +' '+ updatedUser.lastname} updated` })
 })
 
-// @desc Delete a user
-// @route DELETE /users
-// @access Private
+//DELETE /users
 const deleteUser = asyncHandler(async (req, res) => {
-    const { id } = req.body
+    const { id } = req.body;
 
     // Confirm data
     if (!id) {
@@ -106,7 +102,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 
     
     // Does the user exist to delete?
-    const user = await User.findById(id).exec()
+    const user = await User.findById(id)
 
     if (!user) {
         return res.status(400).json({ message: 'User not found' })
