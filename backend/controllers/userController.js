@@ -3,7 +3,7 @@ const User = require('../models/userModel');
 //bcrypt to hash password
 const bcrypt = require('bcrypt');
 
-// @desc Get all users
+// Get all users
 const getAllUsers = (async (req, res) => {
     const users = await User.find().select('-password');
 
@@ -19,7 +19,7 @@ const getAllUsers = (async (req, res) => {
 
 //Create new user
 const createNewUser = (async (req, res) => {
-    const {firstname, lastname, email, password, roles } = req.body;
+    const {firstname, lastname, email, password, roles} = req.body;
 
     // Confirm all data fields
     if (!firstname || !lastname || !email || !password || !Array.isArray(roles) || !roles.length) {
