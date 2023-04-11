@@ -1,14 +1,11 @@
 const User = require('../models/userModel');
-//asynHandler-error handling
-const asyncHandler = require('express-async-handler');
+
 //bcrypt to hash password
 const bcrypt = require('bcrypt');
 
 // @desc Get all users
-// @route GET /users
-// @access Private
-const getAllUsers = asyncHandler(async (req, res) => {
-    const users = await User.find().select('-password').lean();
+const getAllUsers = (async (req, res) => {
+    const users = await User.find().select('-password');
 
     if(!users?.length){
         return res.status(400).json({
@@ -21,7 +18,7 @@ const getAllUsers = asyncHandler(async (req, res) => {
 });
 
 //Create new user
-const createNewUser = asyncHandler(async (req, res) => {
+const createNewUser = (async (req, res) => {
     const {firstname, lastname, email, password, roles } = req.body;
 
     // Confirm all data fields
@@ -30,7 +27,7 @@ const createNewUser = asyncHandler(async (req, res) => {
     }
 
     // Check for duplicate email
-    const duplicate = await User.findOne({ email }).lean();
+    const duplicate = await User.findOne({ email });
 
     if (duplicate) {
         return res.status(409).json({ message: 'User already exists' });
@@ -52,7 +49,7 @@ const createNewUser = asyncHandler(async (req, res) => {
 });
 
 // Update a user
-const updateUser = asyncHandler(async (req, res) => {
+const updateUser = (async (req, res) => {
     const { id, firstname, lastname, email, password, roles, active } = req.body
 
     // Confirm data 
@@ -68,7 +65,7 @@ const updateUser = asyncHandler(async (req, res) => {
     }
 
     // Check for duplicate 
-    const duplicate = await User.findOne({ email }).lean()
+    const duplicate = await User.findOne({ email })
 
     // Allow updates to the original user 
     if (duplicate && duplicate?._id.toString() !== id) {
@@ -92,7 +89,7 @@ const updateUser = asyncHandler(async (req, res) => {
 })
 
 //DELETE /users
-const deleteUser = asyncHandler(async (req, res) => {
+const deleteUser = (async (req, res) => {
     const { id } = req.body;
 
     // Confirm data

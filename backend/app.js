@@ -3,7 +3,6 @@ const express = require('express');
 const app = express();
 const errorHandler = require('./middleware/errorHandler');
 const cookieParser = require('cookie-parser');
-const cors = require('cors');
 const connectDB = require('./config/dbConnection');
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 8000
