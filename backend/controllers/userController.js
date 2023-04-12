@@ -67,10 +67,12 @@ const updateUser = (async (req, res) => {
     // Check for duplicate 
     const duplicate = await User.findOne({ email })
 
-    // Allow updates to the original user 
-    if (duplicate && duplicate?._id.toString() !== id) {
-        return res.status(409).json({ message: 'Duplicate username' })
-    }
+    // Allow updates to the original product
+    if (duplicate) {
+            return res.status(409).json({ message: 'Duplicate product id' })
+        }
+
+  
 
     user.firstname = firstname;
     user.lastname = lastname;

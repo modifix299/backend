@@ -18,15 +18,15 @@ const getAllProducts = (async (req, res) => {
 
 //Create new product
 const createNewProduct = (async (req, res) => {
-    const {productid, productname, price, quantity} = req.body;
+    const {productname, price, quantity} = req.body;
 
     // Confirm all data fields
-    if (!productid || !productname || !price || !quantity ) {
+    if ( !productname || !price || !quantity ) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
     // Check for duplicate productid
-    const duplicate = await Product.findOne({ productid });
+    const duplicate = await Product.findById();
 
     if (duplicate) {
         return res.status(409).json({ message: 'Product already exists' });
@@ -34,13 +34,13 @@ const createNewProduct = (async (req, res) => {
 
     
 
-    const productObject = { productid, productname, price, quantity };
+    const productObject = { productname, price, quantity };
 
     // Create and store new user 
     const product = await Product.create(productObject);
 
     if (product) { //created 
-        res.status(201).json({ message: `New product, ID_${productid+' '+productname} created` });
+        res.status(201).json({ message: `New product, ID_${productname} created` });
     } else {
         res.status(400).json({ message: 'Invalid data received' });
     }
@@ -48,29 +48,29 @@ const createNewProduct = (async (req, res) => {
 
 // Update a product
 const updateProduct = (async (req, res) => {
-    const { productid, productname, price, quantity } = req.body
+    const { _id, productname, price, quantity } = req.body
 
     // Confirm data 
-    if ( !productid || !productname || !price || !quantity) {
+    if ( !_id || !productname || !price || !quantity) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
     // Does the product exist to update?
-    const product = await Product.findOne({productid});
+    const product = await Product.findById(_id);
 
     if (!product) {
         return res.status(400).json({ message: 'Product not found' })
     }
 
     // Check for duplicate 
-    const duplicate = await Product.findOne({ productid })
+    // const duplicate = await Product.findById();
 
     // Allow updates to the original product
-    if (!duplicate) {
-        return res.status(409).json({ message: 'Duplicate product id' })
-    }
+    // if (!duplicate) {
+    //     return res.status(409).json({ message: 'Duplicate product id' })
+    // }
 
-    product.productid = productid;
+
     product.productname = productname;
     product.price = price;
     product.quantity = quantity;
@@ -79,21 +79,21 @@ const updateProduct = (async (req, res) => {
 
     const updatedProduct = await product.save()
 
-    res.json({ message: `ID_${productid+' '+updatedProduct.productname} updated` })
+    res.json({ message: `Product ${updatedProduct.productname} updated` })
 })
 
 //DELETE /products
 const deleteProduct = (async (req, res) => {
-    const { productid } = req.body;
+    const {_id} = req.body;
 
     // Confirm data
-    if (!productid) {
+    if (!_id) {
         return res.status(400).json({ message: 'Product ID Required' })
     }
 
     
     // Does the product exist to delete?
-    const product = await Product.findOne({productid})
+    const product = await Product.findById(_id)
 
     if (!product) {
         return res.status(400).json({ message: 'Product not found' })
@@ -101,7 +101,7 @@ const deleteProduct = (async (req, res) => {
 
     const result = await product.deleteOne()
 
-    const reply = `Product with ID_${result.productid} ${result.productname} deleted`
+    const reply = `Product ${result.productname} deleted`
 
     res.json(reply)
 })
