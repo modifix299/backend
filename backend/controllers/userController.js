@@ -17,12 +17,26 @@ const getAllUsers = (async (req, res) => {
 
 });
 
+// Get One user
+const getOneUser = (async (req, res) => {
+    const id = req.params['id'];
+
+    const user = await User.findById(id).select('-password');
+
+    if (!user) {
+        return res.status(400).json({ message: 'User not found' })
+    } else {
+        return res.status(201).json(user);
+    } 
+
+});
+
 //Create new user
 const createNewUser = (async (req, res) => {
-    const {firstname, lastname, email, password, roles} = req.body;
+    const {firstname, lastname, email, password, role} = req.body;
 
     // Confirm all data fields
-    if (!firstname || !lastname || !email || !password || !Array.isArray(roles) || !roles.length) {
+    if (!firstname || !lastname || !email || !password || !role) {
         return res.status(400).json({ message: 'All fields are required' })
     }
 
@@ -36,7 +50,7 @@ const createNewUser = (async (req, res) => {
     // Hash password 
     const hashedPwd = await bcrypt.hash(password, 10); // salt rounds
 
-    const userObject = { firstname, lastname, email, "password": hashedPwd, roles };
+    const userObject = { firstname, lastname, email, "password": hashedPwd, role };
 
     // Create and store new user 
     const user = await User.create(userObject);
@@ -50,10 +64,10 @@ const createNewUser = (async (req, res) => {
 
 // Update a user
 const updateUser = (async (req, res) => {
-    const { id, firstname, lastname, email, password, roles, active } = req.body
+    const { id, firstname, lastname, email, password, role, active } = req.body
 
     // Confirm data 
-    if (!id || !firstname || !lastname || !email || !Array.isArray(roles) || !roles.length || typeof active !== 'boolean') {
+    if (!id || !firstname || !lastname || !email || !role || typeof active !== 'boolean') {
         return res.status(400).json({ message: 'All fields except password are required' })
     }
 
@@ -68,16 +82,16 @@ const updateUser = (async (req, res) => {
     const duplicate = await User.findOne({ email })
 
     // Allow updates to the original product
-    if (duplicate) {
-            return res.status(409).json({ message: 'Duplicate product id' })
-        }
+    if (duplicate.id != id ) {
+        return res.status(409).json({ message: 'Duplicate user id' })
+    }
 
   
 
     user.firstname = firstname;
     user.lastname = lastname;
     user.email = email;
-    user.roles = roles;
+    user.role = role;
     user.active = active;
 
     if (password) {
@@ -116,6 +130,7 @@ const deleteUser = (async (req, res) => {
 
 module.exports = {
     getAllUsers,
+    getOneUser,
     createNewUser,
     updateUser,
     deleteUser
