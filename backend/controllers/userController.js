@@ -29,7 +29,7 @@ const getOneUser = (async (req, res) => {
         return res.status(201).json(user);
     } 
 
-});
+});  
 
 //Create new user
 const createNewUser = (async (req, res) => {
@@ -134,4 +134,4 @@ module.exports = {
     createNewUser,
     updateUser,
     deleteUser
-}
+}  

@@ -18,6 +18,7 @@ app.use(errorHandler)
 //Routes
 app.use('/users', require('./routes/userRoutes'));
 app.use('/products', require('./routes/productRoutes'));
+app.use('/customers', require('./routes/customerRoutes'));
 app.use('/admin/auth', require('./routes/adminAuthRoutes.js'));
  
 connectDB().then(()=>{
